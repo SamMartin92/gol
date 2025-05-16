@@ -4,10 +4,18 @@ import (
 	"fmt"
 )
 
+var neighbourCoords [8][2]int = [8][2]int{
+	{-1, -1}, {-1, 0}, {-1, 1},
+	{0, -1}, {0, 1},
+	{1, -1}, {1, 0}, {1, 1},
+}
+
+	
 
 type Grid struct {
 	cols, rows int
 	grid [][]Cell
+	neighbourCoords [8][2]int
 }
 
 
@@ -16,14 +24,9 @@ func (g Grid) InitiateCells() {
 		for col:= range g.cols {
 			cell := Cell{col, row, 0, false}
 			g.grid[row] = append(g.grid[row], cell)
-			// cell.col = col
-			// cell.row = row
-			// cell.neighbours = 0
-			// cell.alive = false
 		}
 	}
 }
-
 
 
 func (g Grid) DisplayGrid(){
@@ -35,6 +38,34 @@ func (g Grid) DisplayGrid(){
 		}
 	}
 	fmt.Println()
+}
+
+
+func (g Grid) CountLivingNeighbours(row, col int) int {
+	count:=0
+
+	for coord := range g.neighbourCoords {
+		var neighbourCoord [2]int
+		//can make this a switch case
+		if row + g.neighbourCoords[coord][0] != len(g.grid) {
+			neighbourCoord[0] = row + g.neighbourCoords[coord][0] 
+		} else {
+			neighbourCoord[0] = 0
+		}
+
+		if col + g.neighbourCoords[coord][1] != len(g.grid) {
+			neighbourCoord[1] = col + g.neighbourCoords[coord][1]
+		} else {
+			neighbourCoord[1] = 0
+		}
+
+		neighbour:= g.grid[neighbourCoord[0]][neighbourCoord[1]]
+		fmt.Println(neighbour.row, neighbour.col)
+		if neighbour.alive {
+			count+=1
+		}
+	}
+	return count
 }
 
 
@@ -54,12 +85,33 @@ func (c Cell) Rep() string {
 
 
 func main(){
-	grid := Grid{10, 10, make([][]Cell, 10)}
-	//fmt.Println(grid.grid)
-	//fmt.Println(len(grid.grid))
+	
+	grid := Grid{10, 10, make([][]Cell,10), neighbourCoords}
 	grid.InitiateCells()
+
+	grid.grid[2][2].alive = true
+	grid.grid[3][2].alive = true
+	grid.grid[1][2].alive = true
+	grid.grid[0][1].alive = true
+	grid.grid[1][3].alive = true
+	grid.grid[4][4].alive = true
+	grid.grid[1][3].alive = true
+	grid.grid[4][4].alive = true
+	grid.grid[1][3].alive = true
+	grid.grid[6][6].alive = true
+	grid.grid[6][7].alive = true
+	grid.grid[7][8].alive = true
+	grid.grid[6][8].alive = true
+	grid.grid[8][9].alive = true
+	grid.grid[9][8].alive = true
+	grid.grid[1][1].alive = true
+	grid.grid[1][2].alive = true
+	grid.grid[2][1].alive = true
+	grid.grid[2][2].alive = true
+	
 	grid.DisplayGrid()
 
-	// cell := Cell{10,10,5,false}
-	// fmt.Println(cell.Rep())
+	fmt.Println(grid.CountLivingNeighbours(4,5))
+
+
 }
