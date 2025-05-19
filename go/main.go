@@ -153,7 +153,7 @@ func main(){
 
 	for x:= true; x; {
 		time.Sleep(1 * time.Second)
-		grid := grid.GenerateNextGrid()
+		grid = grid.GenerateNextGrid()
 		grid.DisplayGrid()
 	}
 	
