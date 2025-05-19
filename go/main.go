@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 )
 
 var neighbourCoords [8][2]int = [8][2]int{
@@ -13,7 +14,7 @@ var neighbourCoords [8][2]int = [8][2]int{
 	
 
 type Grid struct {
-	cols, rows int
+	rows, cols int
 	grid [][]Cell
 	neighbourCoords [8][2]int
 }
@@ -22,7 +23,7 @@ type Grid struct {
 func (g Grid) InitiateCells() {
 	for row:= range g.rows {
 		for col:= range g.cols {
-			cell := Cell{col, row, 0, false}
+			cell := Cell{row, col, 0, false}
 			g.grid[row] = append(g.grid[row], cell)
 		}
 	}
@@ -43,7 +44,6 @@ func (g Grid) DisplayGrid(){
 // this can be much better, make this a switch case, abstract the coords
 func (g Grid) CountLivingNeighbours(row, col int) int {
 	count:=0
-
 	for coord := range g.neighbourCoords {
 		var neighbourCoord [2]int
 
@@ -55,7 +55,7 @@ func (g Grid) CountLivingNeighbours(row, col int) int {
 			neighbourCoord[0] = 0
 		}
 
-		if row + g.neighbourCoords[coord][1] == -1 {
+		if col + g.neighbourCoords[coord][1] == -1 {
 			neighbourCoord[1] = len(g.grid)-1
 		} else if col + g.neighbourCoords[coord][1] != len(g.grid){
 			neighbourCoord[1] = col + g.neighbourCoords[coord][1]
@@ -64,7 +64,6 @@ func (g Grid) CountLivingNeighbours(row, col int) int {
 		}
 
 		neighbour:= g.grid[neighbourCoord[0]][neighbourCoord[1]]
-		fmt.Println(neighbour.row, neighbour.col)
 		if neighbour.alive {
 			count+=1
 		}
@@ -73,8 +72,43 @@ func (g Grid) CountLivingNeighbours(row, col int) int {
 }
 
 
+func (g Grid) UpdateCellState(row,col int) bool {
+	cell := g.grid[row][col]
+
+	cell.neighbours = g.CountLivingNeighbours(row,col)
+
+	if cell.alive {
+		if cell.neighbours == 2 || cell.neighbours == 3 {
+			return true
+		} else {
+			return false
+		}
+	} else {
+		if cell.neighbours == 3 {
+			return true
+		}		
+	}
+
+	return cell.alive
+}
+
+
+func (g Grid) GenerateNextGrid() Grid {
+	new_grid := Grid{g.rows, g.cols, make([][]Cell,g.rows), neighbourCoords}
+	new_grid.InitiateCells()
+	
+	for row := range g.rows {
+		for col := range g.cols {
+			new_grid.grid[row][col].alive = g.UpdateCellState(row,col)
+		}
+	}
+
+	return new_grid
+}
+
+
 type Cell struct {
-	col, row, neighbours int
+	row, col, neighbours int
 	alive bool
 }
 
@@ -108,14 +142,21 @@ func main(){
 	grid.grid[6][8].alive = true
 	grid.grid[8][9].alive = true
 	grid.grid[9][8].alive = true
+	grid.grid[9][9].alive = true
+	grid.grid[0][0].alive = true
 	grid.grid[1][1].alive = true
 	grid.grid[1][2].alive = true
-	grid.grid[2][1].alive = true
 	grid.grid[2][2].alive = true
 	
 	grid.DisplayGrid()
 
-	fmt.Println(grid.CountLivingNeighbours(0,0))
+
+	for x:= true; x; {
+		time.Sleep(1 * time.Second)
+		grid := grid.GenerateNextGrid()
+		grid.DisplayGrid()
+	}
+	
 
 
 }
