@@ -40,22 +40,26 @@ func (g Grid) DisplayGrid(){
 	fmt.Println()
 }
 
-
+// this can be much better, make this a switch case, abstract the coords
 func (g Grid) CountLivingNeighbours(row, col int) int {
 	count:=0
 
 	for coord := range g.neighbourCoords {
 		var neighbourCoord [2]int
-		//can make this a switch case
-		if row + g.neighbourCoords[coord][0] != len(g.grid) {
+
+		if row + g.neighbourCoords[coord][0] == -1 {
+			neighbourCoord[0] = len(g.grid)-1 
+		} else if row + g.neighbourCoords[coord][0] != len(g.grid) {
 			neighbourCoord[0] = row + g.neighbourCoords[coord][0] 
 		} else {
 			neighbourCoord[0] = 0
 		}
 
-		if col + g.neighbourCoords[coord][1] != len(g.grid) {
+		if row + g.neighbourCoords[coord][1] == -1 {
+			neighbourCoord[1] = len(g.grid)-1
+		} else if col + g.neighbourCoords[coord][1] != len(g.grid){
 			neighbourCoord[1] = col + g.neighbourCoords[coord][1]
-		} else {
+		}else {
 			neighbourCoord[1] = 0
 		}
 
@@ -111,7 +115,7 @@ func main(){
 	
 	grid.DisplayGrid()
 
-	fmt.Println(grid.CountLivingNeighbours(4,5))
+	fmt.Println(grid.CountLivingNeighbours(0,0))
 
 
 }
